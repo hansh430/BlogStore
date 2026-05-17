@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlogStore.Models
@@ -16,13 +18,16 @@ namespace BlogStore.Models
         [Required]
         [MaxLength(100, ErrorMessage = "Length cannot exceed 100 characters")]
         public string Author { get; set; }
+        [ValidateNever]
         public string FeatureImagePath { get; set; }
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
         [ForeignKey("Category")]
+        [DisplayName("Category")]
         public int CategoryId { get; set; }
+        [ValidateNever]
         public Category Category { get; set; }
-
+        [ValidateNever]
         public ICollection<Comment> Comments { get; set; }
     }
 }
