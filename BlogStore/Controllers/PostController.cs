@@ -77,16 +77,96 @@ namespace BlogStore.Controllers
             return View(pvModel);
         }
 
-        public JsonResult AddComment([FromBody]Comment comment)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == null)
+                return NotFound();
+            var postFromDB = await _context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+            if (postFromDB == null)
+                return NotFound();
+            EditViewModel editViewModel = new EditViewModel
+            {
+                Post = postFromDB,
+                Categories = _context.Categories.Select(c =>
+                new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList()
+            };
+            return View(editViewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditViewModel editViewModel)
+        {
+            if (!ModelState.IsValid)
+                return View(editViewModel);
+            var postFromDB = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == editViewModel.Post.Id);
+            if (postFromDB == null)
+                return NotFound();
+            if (editViewModel.FeatureImage != null)
+            {
+
+                var inputFileExtension = Path.GetExtension(editViewModel.FeatureImage.FileName).ToLower();
+                bool isAllowed = alowedExtensions.Contains(inputFileExtension);
+                if (!isAllowed)
+                {
+                    ModelState.AddModelError("", "Invalid image format,allowed only .jpg, jpeg, .png");
+                    return View(editViewModel);
+                }
+                var existingFilePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                    "Images", Path.GetFileName(postFromDB.FeatureImagePath));
+                if (System.IO.File.Exists(existingFilePath))
+                {
+                    System.IO.File.Delete(existingFilePath);
+                }
+                editViewModel.Post.FeatureImagePath = await UploadFileToFolder(editViewModel.FeatureImage);
+            }
+            else
+            {
+                editViewModel.Post.FeatureImagePath = postFromDB.FeatureImagePath;
+            }
+            _context.Posts.Update(editViewModel.Post);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id < 0)
+            {
+                return BadRequest();
+            }
+
+            var postFromDb = await _context.Posts.FindAsync(id);
+            if (postFromDb == null)
+            {
+                return NotFound();
+            }
+            if (!string.IsNullOrEmpty(postFromDb.FeatureImagePath))
+            {
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", Path.GetFileName(postFromDb.FeatureImagePath));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+            _context.Posts.Remove(postFromDb);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+        public JsonResult AddComment([FromBody] Comment comment)
         {
             comment.CommentDate = DateTime.Now;
             _context.Comments.Add(comment);
             _context.SaveChanges();
             return Json(new
             {
-                username=comment.UserName,
-                commentDate=comment.CommentDate.ToString("MMMM dd, yyyy"),
-                content=comment.Content
+                username = comment.UserName,
+                commentDate = comment.CommentDate.ToString("MMMM dd, yyyy"),
+                content = comment.Content
             });
         }
         private async Task<string> UploadFileToFolder(IFormFile featureImage)
