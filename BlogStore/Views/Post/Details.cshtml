@@ -22,13 +22,13 @@
 <div class="row mb-4">
     <div class="col-12 col-md-6">
     </div>
-   @*  @if (User.IsInRole("Admin"))
-    { *@
+    @if (User.IsInRole("Admin"))
+    {
         <div class="col-12 col-md-6 text-end">
             <a asp-action="Edit" asp-route-id ="@Model.Id" class="btn btn-secondary rounded  ">Edit Post</a>
         <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger rounded mx-3 ">Delete Post</a>
     </div>
-    @* } *@
+    }
 </div>
 <div class="content-wrapper">
     <h1>@Model.Title</h1>
@@ -63,8 +63,8 @@
     {
         <p class="text-muted fst-italic">No comments yet. Be the first to comment!</p>
     }
-   @*  @if(User.Identity.IsAuthenticated)
-    { *@
+    @if(User.Identity.IsAuthenticated)
+    {
     <h4>Add a Comment</h4>
     <form id="commentForm">
         <div class="form-group">
@@ -77,7 +77,7 @@
         </div>  
         <button type="submit" class="btn btn-primary mt-2 p-2 rounded">Submit Comment</button>
     </form>
-    @* } *@
+    }
 </div>
 @section Scripts{
     <script>

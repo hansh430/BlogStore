@@ -1,6 +1,7 @@
 using BlogStore.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +23,34 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.LoginPath = "/Auth/Login";
+    options.AccessDeniedPath = "/Auth/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
 });
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var _userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var _roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string adminEmail = "admin@gmail.com";
+    string adminPassword = "admin";
+
+    var isExistingAdminRole = await _roleManager.FindByNameAsync("Admin");
+    if (isExistingAdminRole == null)
+    {
+        await _roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+    var existingAminUser = await _userManager.FindByEmailAsync(adminEmail);
+    if (existingAminUser == null)
+    {
+        var adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail };
+        await _userManager.CreateAsync(adminUser, adminPassword);
+        await _userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,6 +1,7 @@
 ﻿using BlogStore.Data;
 using BlogStore.Models;
 using BlogStore.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -39,6 +40,8 @@ namespace BlogStore.Controllers
                 return NotFound();
             return View(post);
         }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             PostViewModel pvModel = new PostViewModel();
@@ -52,6 +55,7 @@ namespace BlogStore.Controllers
             return View(pvModel);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(PostViewModel pvModel)
         {
             if (ModelState.IsValid)
@@ -78,6 +82,7 @@ namespace BlogStore.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             if (id == null)
@@ -98,6 +103,7 @@ namespace BlogStore.Controllers
             return View(editViewModel);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(EditViewModel editViewModel)
         {
             if (!ModelState.IsValid)
@@ -132,8 +138,21 @@ namespace BlogStore.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
+        {
+            var postFromDb = await _context.Posts.FindAsync(id);
+            if (postFromDb == null)
+            {
+                return NotFound();
+            }
+            return View(postFromDb);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirm(int id)
         {
             if (id < 0)
             {
@@ -157,6 +176,8 @@ namespace BlogStore.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        [Authorize]
         public JsonResult AddComment([FromBody] Comment comment)
         {
             comment.CommentDate = DateTime.Now;
@@ -193,5 +214,6 @@ namespace BlogStore.Controllers
             }
             return "/images/" + fileName;
         }
+
     }
 }
