@@ -46,51 +46,6 @@ SQL Server	Database
 ASP.NET Identity	Authentication
 Bootstrap	UI Styling
 TinyMCE	Rich Text Editor
-Project Structure
-BlogPost123/
-│
-├── Areas/
-├── Data/
-├── Migrations/
-├── Models/
-├── Pages/
-├── wwwroot/
-├── appsettings.json
-├── Program.cs
-└── BlogPost123.csproj
-Setup Instructions
-1. Clone Repository
-git clone YOUR_REPOSITORY_URL
-2. Open Project
-
-Open the solution in:
-
-Visual Studio
-
-3. Configure Database
-
-Update connection string inside:
-
-appsettings.json
-
-Example:
-
-"ConnectionStrings": {
-  "DefaultConnection": "YOUR_SQL_SERVER_CONNECTION_STRING"
-}
-4. Apply Database Migration
-
-Run:
-
-dotnet ef database update
-5. Run Project
-dotnet run
-
-OR press:
-
-F5
-
-inside Visual Studio.
 
 Deployment
 
@@ -104,9 +59,7 @@ Deployment includes:
 ASP.NET Core WebDeploy
 SQL Server cloud integration
 FTP/WebDeploy publishing
-TinyMCE Configuration
 
-TinyMCE is self-hosted inside the project to avoid:
 
 API key dependency
 domain restrictions
@@ -134,9 +87,6 @@ Search Functionality
 Image Upload Support
 Pagination
 Admin Dashboard
-REST API Integration
-Dark Mode
-Author
 
 Hanshu Kumar
 Experience in C# .NET, Game Development, and Web Development
