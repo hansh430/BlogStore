@@ -150,7 +150,8 @@ namespace BlogStore.Controllers
             return View(postFromDb);
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirm(int id)
         {
